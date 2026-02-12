@@ -10,11 +10,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: List files
-      run: ls -la
+    - name: Build Step
+      run: echo "Website build completed"
 
-    - name: Build Message
-      run: echo "Website build successful"
+    - name: Notify Slack Success
+      if: success()
+      run: |
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{"text":"✅ CI Build Successful - Website Updated"}' \
+        ${{ secrets.SLACK_WEBHOOK }}
+
+    - name: Notify Slack Failure
+      if: failure()
+      run: |
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{"text":"❌ CI Build Failed"}' \
+        ${{ secrets.SLACK_WEBHOOK }}
